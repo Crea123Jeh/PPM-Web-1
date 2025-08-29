@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PPM Management</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="sidebar.css">
+
+
+  <!-- Firebase SDKs (defer so they don't block) -->
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+  <script defer src="firebaseConfig.js"></script>
+</head>
+
+<body>
+  <div class="app">
+    <!-- Mobile hamburger -->
+    <button id="sidebarToggle" class="sidebar-toggle" aria-label="Open menu" aria-expanded="false"
+      aria-controls="sidebar">
+      ☰
+    </button>
+
+    <!-- sidebar.html -->
+    <aside id="appSidebar" class="ppm-sidebar" aria-label="Primary">
+      <div class="ppm-brand">
+        <div class="ppm-brand-icon" aria-hidden="true">🏢</div>
+        <div class="ppm-brand-text">
+          <div class="ppm-title">PPM Management</div>
+        </div>
+      </div>
+
+      <nav class="ppm-nav" role="navigation" aria-label="Main navigation">
+        <a class="ppm-item" href="dashboard.html" data-key="dashboard">
+          <span class="ppm-icon" aria-hidden="true">
+            <!-- grid icon -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="3" width="8" height="8" rx="1.5" />
+              <rect x="13" y="3" width="8" height="8" rx="1.5" />
+              <rect x="3" y="13" width="8" height="8" rx="1.5" />
+              <rect x="13" y="13" width="8" height="8" rx="1.5" />
+            </svg>
+          </span>
+          <span class="ppm-label">Dashboard</span>
+        </a>
+
+        <a class="ppm-item" href="projects.html" data-key="projects">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M3 7h18M3 12h18M3 17h18" />
+            </svg>
+          </span>
+          <span class="ppm-label">Projects</span>
+        </a>
+
+        <a class="ppm-item" href="archived.html" data-key="archived">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M5 7h14l-1 12H6z" />
+              <path d="M9 7V4h6v3" />
+            </svg>
+          </span>
+          <span class="ppm-label">Archived Projects</span>
+        </a>
+
+        <a class="ppm-item" href="target-list.html" data-key="targets">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="8" />
+              <path d="M12 8v4l2 2" />
+            </svg>
+          </span>
+          <span class="ppm-label">Target List</span>
+        </a>
+
+        <a class="ppm-item" href="ppm-calendar.html" data-key="ppm-calendar">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="5" width="18" height="16" rx="2" />
+              <path d="M16 3v4M8 3v4M3 11h18" />
+            </svg>
+          </span>
+          <span class="ppm-label">PPM Calendar</span>
+        </a>
+
+        <a class="ppm-item" href="previous-activity.html" data-key="previous-activity">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 12A9 9 0 1 0 3 12" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+          </span>
+          <span class="ppm-label">Previous Activity</span>
+        </a>
+
+        <a class="ppm-item" href="birthday-calendar.html" data-key="birthday-calendar">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 3v4" />
+              <path d="M7 7v-2" />
+              <path d="M17 7v-2" />
+              <rect x="3" y="8" width="18" height="13" rx="2" />
+            </svg>
+          </span>
+          <span class="ppm-label">Birthday Calendar</span>
+        </a>
+
+        <a class="ppm-item" href="academic.html" data-key="academic">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2l8 4-8 4-8-4 8-4z" />
+              <path d="M3 10l9 5 9-5" />
+              <path d="M3 18l9 4 9-4" />
+            </svg>
+          </span>
+          <span class="ppm-label">Academic Calendar</span>
+        </a>
+
+        <a class="ppm-item" href="violations.html" data-key="violations">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2l9 4v6c0 5-4 10-9 12-5-2-9-7-9-12V6l9-4z" />
+              <path d="M12 8v4" />
+            </svg>
+          </span>
+          <span class="ppm-label">Violations</span>
+        </a>
+
+        <a class="ppm-item" href="projects.html" data-key="projects">
+          <span class="ppm-icon">
+            <!-- Folder -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M3 7h5l2 3h11v11H3z" />
+            </svg>
+          </span>
+          <span class="ppm-label">Projects</span>
+        </a>
+
+        <a class="ppm-item" href="archived.html" data-key="archived">
+          <span class="ppm-icon">
+            <!-- Archive -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="4" width="18" height="4" />
+              <path d="M5 8v12h14V8" />
+            </svg>
+          </span>
+          <span class="ppm-label">Archived Projects</span>
+        </a>
+
+        <a class="ppm-item" href="targets.html" data-key="targets">
+          <span class="ppm-icon">
+            <!-- Bullseye -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" />
+              <circle cx="12" cy="12" r="6" />
+              <circle cx="12" cy="12" r="2" />
+            </svg>
+          </span>
+          <span class="ppm-label">Target List</span>
+        </a>
+
+        <a class="ppm-item" href="ppm-calendar.html" data-key="calendar">
+          <span class="ppm-icon">
+            <!-- Calendar -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </span>
+          <span class="ppm-label">PPM Calendar</span>
+        </a>
+
+        <a class="ppm-item" href="violations.html" data-key="violations">
+          <span class="ppm-icon">
+            <!-- Shield -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2l9 4v6c0 5-4 10-9 12-5-2-9-7-9-12V6l9-4z" />
+              <path d="M12 8v4" />
+            </svg>
+          </span>
+          <span class="ppm-label">Violations</span>
+        </a>
+
+        <a class="ppm-item" href="team-chat.html" data-key="chat">
+          <span class="ppm-icon">
+            <!-- Message Circle -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 11.5a8.38 8.38 0 01-9 8.5 8.38 8.38 0 01-3-.5L3 21l1.5-4.5a8.5 8.5 0 1116.5-5z" />
+            </svg>
+          </span>
+          <span class="ppm-label">Team Chat</span>
+        </a>
+
+        <a class="ppm-item" href="information.html" data-key="info">
+          <span class="ppm-icon">
+            <!-- Info -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+          </span>
+          <span class="ppm-label">Information</span>
+        </a>
+
+        <a class="ppm-item" href="knowledge.html" data-key="knowledge">
+          <span class="ppm-icon">
+            <!-- Book -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+              <path d="M4 4.5A2.5 2.5 0 016.5 7H20" />
+              <path d="M20 22V2" />
+            </svg>
+          </span>
+          <span class="ppm-label">Knowledge Hub</span>
+        </a>
+
+        <a class="ppm-item" href="latihan-sigma.html" data-key="sigma">
+          <span class="ppm-icon">
+            <!-- Clipboard -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="9" y="2" width="6" height="4" rx="1" />
+              <path d="M9 4H4v18h16V4h-5" />
+            </svg>
+          </span>
+          <span class="ppm-label">Latihan Soal Sigma</span>
+        </a>
+
+        <a class="ppm-item" href="assets.html" data-key="assets">
+          <span class="ppm-icon">
+            <!-- Cube -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path
+                d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4a2 2 0 001-1.73z" />
+              <path d="M3.27 6.96L12 12l8.73-5.04" />
+              <path d="M12 22V12" />
+            </svg>
+          </span>
+          <span class="ppm-label">Total Assets</span>
+        </a>
+
+        <a class="ppm-item" href="sheet.html" data-key="sheet">
+          <span class="ppm-icon">
+            <!-- File Text -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <path d="M14 2v6h6" />
+              <path d="M16 13H8" />
+              <path d="M16 17H8" />
+              <path d="M10 9H8" />
+            </svg>
+          </span>
+          <span class="ppm-label">Sheet 5B7S</span>
+        </a>
+
+        <a class="ppm-item" href="radio.html" data-key="radio">
+          <span class="ppm-icon">
+            <!-- Radio -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="2" />
+              <path d="M4.93 4.93a10 10 0 0114.14 0" />
+              <path d="M1.42 1.42a16 16 0 0122.63 0" />
+            </svg>
+          </span>
+          <span class="ppm-label">PPM Radio</span>
+        </a>
+
+        <a class="ppm-item" href="bot-list.html" data-key="bots">
+          <span class="ppm-icon">
+            <!-- Bot -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="11" width="18" height="10" rx="2" />
+              <circle cx="7" cy="16" r="1" />
+              <circle cx="17" cy="16" r="1" />
+              <path d="M12 2v4" />
+              <path d="M8 2h8" />
+            </svg>
+          </span>
+          <span class="ppm-label">Bot's List</span>
+        </a>
+
+        <!-- divider -->
+        <div class="ppm-divider" role="separator"></div>
+
+        <a class="ppm-item" href="settings.html" data-key="settings">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83l-.04.04a2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2h-.1a2 2 0 0 1-2-2v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0l-.04-.04a2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2v-.1a2 2 0 0 1 2-2h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82L4.2 6.3a2 2 0 0 1 0-2.83L4.24 3.43a2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2h.1a2 2 0 0 1 2 2v.09c.12.6.6 1.08 1.2 1.2h.01a1.65 1.65 0 0 0 1.51 1z" />
+            </svg>
+          </span>
+          <span class="ppm-label">Settings</span>
+        </a>
+
+        <button id="ppmLogout" class="ppm-item ppm-button" type="button" data-key="logout">
+          <span class="ppm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M16 17l5-5-5-5" />
+              <path d="M21 12H9" />
+              <path d="M9 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4" />
+            </svg>
+          </span>
+          <span class="ppm-label">Logout</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <!-- Welcome card -->
+        <section id="welcomeCard" class="card welcome-card">
+          <div class="welcome-left">
+            <div>
+              <h1 id="welcomeTitle">Welcome back, User!</h1>
+              <p class="muted" id="welcomeSubtitle">Keine Daten Sind Immer Sicher</p>
+              <div class="welcome-actions">
+                <button class="btn primary" id="viewProjectsBtn">View Projects</button>
+                <button class="btn outline" id="viewTargetsBtn">View Target List</button>
+              </div>
+            </div>
+          </div>
+          <div class="welcome-avatar">
+            <div id="avatarCircle" class="avatar-circle">U</div>
+          </div>
+        </section>
+
+        <!-- Summary metrics -->
+        <section class="grid summary-grid" id="summaryGrid">
+          <div class="card summary-card" data-key="ActiveProjects">
+            <div class="card-head">
+              <div class="card-title">Active Projects</div>
+              <div class="card-icon">📁</div>
+            </div>
+            <div class="card-body">
+              <div id="activeProjectsValue" class="metric large">—</div>
+              <div class="metric-label">Active Projects</div>
+            </div>
+          </div>
+
+          <div class="card summary-card" data-key="Targets">
+            <div class="card-head">
+              <div class="card-title">Targets In Progress</div>
+              <div class="card-icon">🎯</div>
+            </div>
+            <div class="card-body">
+              <div id="inProgressTargetsValue" class="metric large">—</div>
+              <div class="metric-label">Targets In Progress</div>
+            </div>
+          </div>
+
+          <div class="card summary-card" data-key="Violations">
+            <div class="card-head">
+              <div class="card-title">Total Violations</div>
+              <div class="card-icon">⚠️</div>
+            </div>
+            <div class="card-body">
+              <div id="violationsValue" class="metric large">—</div>
+              <div class="metric-label">Total Violations</div>
+            </div>
+          </div>
+
+          <div class="card summary-card" data-key="Birthdays">
+            <div class="card-head">
+              <div class="card-title">Today's Birthdays</div>
+              <div class="card-icon">🎂</div>
+            </div>
+            <div class="card-body">
+              <div id="birthdaysValue" class="metric large">—</div>
+              <div class="metric-label">Birthdays Today</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Explore Features -->
+        <section>
+          <h2 class="section-title">Explore Features</h2>
+          <div class="features-grid" id="featuresGrid"></div>
+        </section>
+
+        <!-- Bottom area: recent activity + quick links -->
+        <section class="grid bottom-grid">
+          <div class="card" id="recentActivityCard">
+            <div class="card-head">
+              <div class="card-title"><span style="margin-right:8px">📝</span> Recent Activity</div>
+              <div class="card-desc">Latest updates across your projects and tasks.</div>
+            </div>
+            <div class="card-content" id="recentActivitiesList"></div>
+          </div>
+
+          <div class="card" id="quickLinksCard">
+            <div class="card-head">
+              <div class="card-title">Quick Links</div>
+              <div class="card-desc">Navigate to other important areas quickly.</div>
+            </div>
+            <div class="card-content quick-links" id="quickLinksList"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="dashboard.js"></script>
+  <script src="sidebar.js" defer></script>
+
+</body>
+
+</html>

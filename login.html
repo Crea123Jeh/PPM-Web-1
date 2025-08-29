@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — PPM Management</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css">
+
+  <!-- Load Firebase SDKs with defer so they don't block initial paint -->
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+  <!-- Shared config (if you have it) -->
+  <script defer src="firebaseConfig.js"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="left">
+      <div class="brand">
+        <div class="brand-icon">🏢</div>
+        <div class="brand-text">
+          <h1>PPM Management</h1>
+          <p class="muted">Enter your email and password to access your dashboard.</p>
+        </div>
+      </div>
+
+      <form id="loginForm" class="login-card" novalidate>
+        <!-- Fullscreen overlay loader: starts visible but will auto-hide or be dismissible -->
+        <div id="authLoading" class="full-loading">
+          <div class="spinner" aria-hidden="true"></div>
+          <div class="overlay-actions">
+            <button id="overlayContinue" type="button" class="btn outline">Continue to login</button>
+            <div class="overlay-hint muted">If you’re stuck on loading, click continue to interact with the form.</div>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <label for="email" class="label">Email</label>
+          <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+        </div>
+
+        <div class="input-row">
+          <label for="password" class="label">Password</label>
+          <div class="password-wrapper">
+            <input id="password" type="password" placeholder="Your password" autocomplete="current-password" required />
+            <button id="togglePassword" type="button" class="icon-btn" aria-label="Show password">👁️</button>
+          </div>
+        </div>
+
+        <div id="errorMessage" class="error hidden" role="alert"></div>
+
+        <button id="loginBtn" class="btn primary" type="submit">
+          <span id="loginBtnText">Login</span>
+          <span id="loginBtnSpinner" class="btn-spinner hidden" aria-hidden="true"></span>
+        </button>
+
+        <div class="help-line">
+          <a href="signup.html">Don't have an account? Sign up</a>
+          <a href="forgot-password.html" class="muted small">Forgot password?</a>
+        </div>
+      </form>
+
+      <footer class="legal muted small">
+        <small>© <span id="year"></span> PPM Management</small>
+      </footer>
+    </div>
+
+    <div class="right">
+      <div class="hero">
+        <h2>Welcome back</h2>
+        <p class="lead">Manage projects, calendars, assets, and academic events — all in one place.</p>
+        <ul class="features">
+          <li>Project & target tracking</li>
+          <li>Calendars & reminders</li>
+          <li>Team chat & knowledge hub</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="login.js"></script>
+</body>
+</html>

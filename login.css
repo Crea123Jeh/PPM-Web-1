@@ -1,0 +1,61 @@
+/* login.css (same base theme but overlay improved) */
+:root{
+  --background: 48 100% 97%;
+  --card: 50 100% 98%;
+  --accent: 40 95% 60%;
+  --accent-fore: 40 40% 18%;
+  --text: 45 30% 25%;
+  --muted: 45 25% 45%;
+  --border: 50 70% 85%;
+  --input: 50 80% 90%;
+  --radius: 12px;
+  --shadow: 0 10px 30px rgba(11,9,7,0.06);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:'Poppins',Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:hsl(var(--background));color:hsl(var(--text));-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+a{color:inherit}
+.hidden{display:none}
+.page{display:flex;min-height:100vh;align-items:stretch}
+.left{flex:0 0 480px;padding:40px 36px;background:linear-gradient(180deg,hsl(var(--card)) 0%, color-mix(in hsl,hsl(var(--card)) 92%, hsl(var(--background)) 8%) 100%);box-shadow:var(--shadow);border-right:1px solid hsl(var(--border));display:flex;flex-direction:column;justify-content:center;gap:18px}
+.right{flex:1;padding:48px;display:flex;align-items:center;justify-content:center}
+.brand{display:flex;gap:14px;align-items:center;margin-bottom:8px}
+.brand-icon{width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,#fff,#fff8e6);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 6px 18px rgba(22,18,12,0.06)}
+.brand-text h1{margin:0;font-size:20px}
+.brand-text .muted{margin:4px 0 0;color:hsl(var(--muted));font-size:13px}
+.login-card{background:transparent;padding:8px 0;display:flex;flex-direction:column;gap:12px;position:relative}
+.label{display:block;font-size:13px;font-weight:700;color:hsl(var(--text));margin-bottom:6px}
+.input-row{display:flex;flex-direction:column}
+.input-row input{padding:12px 14px;border-radius:10px;border:1px solid hsl(var(--border));background:hsl(var(--input));font-size:14px;outline:none}
+.input-row input:focus{box-shadow:0 6px 18px rgba(246,201,79,0.08);border-color:hsl(var(--accent));}
+.password-wrapper{display:flex;align-items:center;gap:8px}
+.password-wrapper input{flex:1}
+.icon-btn{background:transparent;border:none;cursor:pointer;padding:8px;border-radius:8px;font-size:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid transparent;font-weight:700;cursor:pointer}
+.btn.primary{background:hsl(var(--accent));color:hsl(var(--accent-fore));box-shadow:0 8px 22px rgba(22,18,12,0.06)}
+.btn.primary:active{transform:translateY(1px)}
+.btn.outline{background:hsl(var(--card));border:1px solid hsl(var(--border))}
+.btn-spinner{width:18px;height:18px;border:2px solid rgba(0,0,0,0.08);border-left-color:rgba(0,0,0,0.25);border-radius:50%;display:inline-block;animation:spin 800ms linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Fullscreen overlay (covers the form). Initially visible; JS will hide or allow interaction. */
+.full-loading{
+  position:absolute;inset:0;background:rgba(255,255,255,0.98);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;z-index:20;pointer-events:auto;
+}
+.full-loading .spinner{width:42px;height:42px;border:4px solid hsl(var(--border));border-left-color:hsl(var(--accent));border-radius:50%;animation:spin 900ms linear infinite;margin-bottom:14px}
+.overlay-actions{display:flex;flex-direction:column;align-items:center;gap:8px}
+.overlay-hint{font-size:13px;margin-top:6px;color:hsl(var(--muted))}
+
+/* When overlay is hidden we also disable pointer-events so the form is interactable */
+.full-loading.hidden{display:none;pointer-events:none}
+
+/* help line and footer */
+.help-line{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.help-line a{font-size:13px;color:hsl(var(--muted))}
+.legal{margin-top:auto;opacity:.9}
+.hero{max-width:520px}
+.hero h2{margin:0 0 6px;font-size:28px}
+.hero .lead{margin:0 0 12px;color:hsl(var(--muted));font-size:15px}
+.features{margin:0;padding-left:18px;color:hsl(var(--muted));}
+.features li{margin:6px 0}
+.error{background:#ffe6e6;border:1px solid #ffbfbf;color:#7a1515;padding:10px;border-radius:8px;font-weight:700}
+@media(max-width:980px){.page{flex-direction:column}.left{flex:unset;width:100%;padding:28px;border-right:none}.right{display:none}}

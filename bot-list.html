@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Configuration List - PPM Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.263.1/font/lucide.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base + palette (uses the colors you already adopted) */
+        :root {
+            --bg: hsl(48 100% 97%);
+            --text: hsl(45 30% 25%);
+            --muted: hsl(48 80% 92%);
+            --border: hsl(50 70% 85%);
+            --primary: hsl(45 90% 55%);
+            --primary-600: hsl(45 90% 50%);
+            --primary-700: hsl(45 90% 45%);
+            --card: hsl(50 100% 98%);
+            --background: #FFE0B2;
+            --accent: #FF6B6B;
+            --foreground: #1a1a1a;
+            --muted-foreground: #6b7280;
+            --sidebar-foreground: #4b5563;
+            --destructive: #ef4444;
+            --destructive-foreground: #ffffff;
+            --success: #10b981;
+            --sidebar-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+        }
+
+        /* ===== App Layout ===== */
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== Sidebar ===== */
+        .ppm-sidebar {
+            position: fixed;
+            inset: 0 auto 0 0;
+            width: 300px;
+            background: #fff;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            z-index: 1000;
+            transform: translateX(0);
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+
+        /* Custom scrollbar */
+        .ppm-sidebar::-webkit-scrollbar { width: 8px; }
+        .ppm-sidebar::-webkit-scrollbar-thumb {
+            background: hsl(45 20% 70%);
+            border-radius: 8px;
+        }
+        .ppm-sidebar:hover::-webkit-scrollbar-thumb {
+            background: hsl(45 25% 60%);
+        }
+
+        /* Brand */
+        .ppm-brand {
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            padding: 14px 16px;
+            background: linear-gradient(180deg, hsl(50 100% 98%), #fff);
+            border-bottom: 1px solid var(--border);
+            z-index: 2;
+        }
+        .ppm-brand-icon { font-size: 18px; }
+        .ppm-title { font-weight: 700; font-size: 14px; }
+
+        /* Menu */
+        .ppm-nav {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 8px;
+            display: grid;
+            gap: 4px;
+        }
+
+        .ppm-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 6px;
+        }
+
+        .ppm-item {
+            display: grid;
+            grid-template-columns: 22px 1fr;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            text-decoration: none;
+            color: var(--text);
+            border-radius: 10px;
+            transition: background .2s ease, box-shadow .2s ease;
+            cursor: pointer;
+        }
+        .ppm-item:hover {
+            background: hsl(45 90% 92% / .45);
+        }
+        .ppm-item.active {
+            background: var(--primary);
+            color: #6a5400;
+            box-shadow: inset 0 0 0 1px hsl(45 85% 45% / .3);
+        }
+        .ppm-icon {
+            display: inline-grid;
+            place-items: center;
+            color: hsl(45 70% 45%);
+        }
+        .ppm-item.active .ppm-icon { color: #6a5400; }
+        .ppm-label {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-left: 1vw;
+        }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            padding: 1rem;
+            margin-left: 300px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Mobile behaviour */
+        .sidebar-toggle {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            padding: 8px 10px;
+            background: var(--primary);
+            color: #5e4a00;
+            border: 0;
+            border-radius: 10px;
+            font-size: 18px;
+            line-height: 1;
+            box-shadow: 0 2px 6px hsl(45 50% 40% / .25);
+            z-index: 1100;
+            display: none;
+        }
+
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.25);
+            z-index: 900;
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .ppm-sidebar {
+                transform: translateX(-100%);
+                box-shadow: none;
+            }
+            .ppm-sidebar.active {
+                transform: translateX(0);
+                box-shadow: 0 8px 24px rgba(0,0,0,.18);
+            }
+            .sidebar-toggle {
+                display: inline-block;
+            }
+            .main {
+                margin-left: 0;
+                padding-top: 58px;
+            }
+            .sidebar-backdrop.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .ppm-label { font-size: 13px; }
+            .ppm-sidebar { width: 240px; }
+        }
+
+        /* Bot List Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header styles */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Card styles */
+        .card {
+            background-color: var(--card);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem 1.5rem 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--foreground);
+        }
+
+        .card-description {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        .card-content {
+            padding: 1rem 1.5rem 1.5rem;
+        }
+
+        /* Table styles */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-header {
+            background-color: var(--muted);
+        }
+
+        .table th, .table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+            cursor: pointer;
+        }
+
+        .table th:hover {
+            background-color: rgba(243, 244, 246, 0.5);
+        }
+
+        .table th div {
+            display: flex;
+            align-items: center;
+        }
+
+        .table-row {
+            transition: background-color 0.2s;
+        }
+
+        .table-row:hover {
+            background-color: rgba(243, 244, 246, 0.5);
+        }
+
+        /* Button styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--accent);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--foreground);
+        }
+
+        .btn-primary:hover {
+            background-color: #fcd34d;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border-color: var(--border);
+            color: var(--foreground);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--muted);
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            color: var(--foreground);
+        }
+
+        .btn-ghost:hover {
+            background-color: var(--muted);
+        }
+
+        .btn-destructive {
+            background-color: var(--destructive);
+            color: var(--destructive-foreground);
+        }
+
+        .btn-destructive:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            height: 2rem;
+            width: 2rem;
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .badge-active {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .badge-inactive {
+            background-color: var(--muted);
+            color: var(--muted-foreground);
+        }
+
+        .badge-error {
+            background-color: var(--destructive);
+            color: var(--destructive-foreground);
+        }
+
+        /* Checkbox styles */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkbox {
+            appearance: none;
+            width: 1rem;
+            height: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            background-color: var(--card);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .checkbox:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checkbox:checked::after {
+            content: "✓";
+            position: absolute;
+            color: var(--foreground);
+            font-size: 0.75rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Dialog styles */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 1rem;
+        }
+
+        .dialog-content {
+            background-color: var(--card);
+            border-radius: 0.5rem;
+            width: 100%;
+            max-width: 32rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .dialog-header {
+            padding: 1.5rem 1.5rem 0.5rem;
+        }
+
+        .dialog-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .dialog-description {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        .dialog-body {
+            padding: 1rem 1.5rem;
+        }
+
+        .dialog-footer {
+            padding: 1rem 1.5rem 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Form styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .form-label {
+            text-align: right;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            grid-column: span 3;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+        }
+
+        .select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            background-color: var(--card);
+            cursor: pointer;
+        }
+
+        .select-content {
+            position: absolute;
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            z-index: 10;
+            margin-top: 0.25rem;
+        }
+
+        .select-item {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .select-item:hover {
+            background-color: var(--muted);
+        }
+
+        .calendar {
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background-color: var(--card);
+        }
+
+        /* Loading spinner */
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .ml-1 {
+            margin-left: 0.25rem;
+        }
+
+        .ml-2 {
+            margin-left: 0.5rem;
+        }
+
+        .mr-2 {
+            margin-right: 0.5rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .py-10 {
+            padding-top: 2.5rem;
+            padding-bottom: 2.5rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-muted {
+            color: var(--muted-foreground);
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .h-4 {
+            height: 1rem;
+        }
+
+        .w-4 {
+            width: 1rem;
+        }
+
+        .h-8 {
+            height: 2rem;
+        }
+
+        .w-8 {
+            width: 2rem;
+        }
+
+        .h-12 {
+            height: 3rem;
+        }
+
+        .w-12 {
+            width: 3rem;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .opacity-40 {
+            opacity: 0.4;
+        }
+
+        /* Scroll area */
+        .scroll-area {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 0.25rem;
+        }
+
+        /* Alert dialog */
+        .alert-dialog-content {
+            background-color: var(--card);
+            border-radius: 0.5rem;
+            width: 100%;
+            max-width: 32rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .md-table-cell {
+                display: none;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .form-label {
+                text-align: left;
+            }
+            
+            .form-input {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Mobile hamburger -->
+        <button id="sidebarToggle" class="sidebar-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+            ☰
+        </button>
+
+        <!-- Sidebar backdrop for mobile -->
+        <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
+        <!-- Sidebar -->
+        <aside id="appSidebar" class="ppm-sidebar" aria-label="Primary">
+            <div class="ppm-brand">
+                <div class="ppm-brand-icon" aria-hidden="true">🏢</div>
+                <div class="ppm-brand-text">
+                    <div class="ppm-title">PPM Management</div>
+                </div>
+            </div>
+
+            <nav class="ppm-nav" role="navigation" aria-label="Main navigation">
+                <a class="ppm-item" href="dashboard.html" data-key="dashboard">
+                    <span class="ppm-icon" aria-hidden="true">
+                        <!-- grid icon -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="3" width="8" height="8" rx="1.5" />
+                            <rect x="13" y="3" width="8" height="8" rx="1.5" />
+                            <rect x="3" y="13" width="8" height="8" rx="1.5" />
+                            <rect x="13" y="13" width="8" height="8" rx="1.5" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Dashboard</span>
+                </a>
+
+                <a class="ppm-item" href="projects.html" data-key="projects">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M3 7h18M3 12h18M3 17h18" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Projects</span>
+                </a>
+
+                <a class="ppm-item" href="archived.html" data-key="archived">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M5 7h14l-1 12H6z" />
+                            <path d="M9 7V4h6v3" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Archived Projects</span>
+                </a>
+
+                <a class="ppm-item" href="target-list.html" data-key="targets">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="8" />
+                            <path d="M12 8v4l2 2" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Target List</span>
+                </a>
+
+                <a class="ppm-item" href="ppm-calendar.html" data-key="ppm-calendar">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="5" width="18" height="16" rx="2" />
+                            <path d="M16 3v4M8 3v4M3 11h18" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">PPM Calendar</span>
+                </a>
+
+                <a class="ppm-item" href="previous-activity.html" data-key="previous-activity">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 12A9 9 0 1 0 3 12" />
+                            <path d="M12 7v5l3 3" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Previous Activity</span>
+                </a>
+
+                <a class="ppm-item" href="birthday-calendar.html" data-key="birthday-calendar">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 3v4" />
+                            <path d="M7 7v-2" />
+                            <path d="M17 7v-2" />
+                            <rect x="3" y="8" width="18" height="13" rx="2" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Birthday Calendar</span>
+                </a>
+
+                <a class="ppm-item" href="academic.html" data-key="academic">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 2l8 4-8 4-8-4 8-4z" />
+                            <path d="M3 10l9 5 9-5" />
+                            <path d="M3 18l9 4 9-4" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Academic Calendar</span>
+                </a>
+
+                <a class="ppm-item" href="violations.html" data-key="violations">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 2l9 4v6c0 5-4 10-9 12-5-2-9-7-9-12V6l9-4z" />
+                            <path d="M12 8v4" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Violations</span>
+                </a>
+
+                <a class="ppm-item" href="team-chat.html" data-key="chat">
+                    <span class="ppm-icon">
+                        <!-- Message Circle -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 11.5a8.38 8.38 0 01-9 8.5 8.38 8.38 0 01-3-.5L3 21l1.5-4.5a8.5 8.5 0 1116.5-5z" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Team Chat</span>
+                </a>
+
+                <a class="ppm-item" href="information.html" data-key="info">
+                    <span class="ppm-icon">
+                        <!-- Info -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="16" x2="12" y2="12" />
+                            <line x1="12" y1="8" x2="12.01" y2="8" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Information</span>
+                </a>
+
+                <a class="ppm-item" href="knowledge.html" data-key="knowledge">
+                    <span class="ppm-icon">
+                        <!-- Book -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+                            <path d="M4 4.5A2.5 2.5 0 016.5 7H20" />
+                            <path d="M20 22V2" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Knowledge Hub</span>
+                </a>
+
+                <a class="ppm-item" href="latihan-sigma.html" data-key="sigma">
+                    <span class="ppm-icon">
+                        <!-- Clipboard -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="9" y="2" width="6" height="4" rx="1" />
+                            <path d="M9 4H4v18h16V4h-5" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Latihan Soal Sigma</span>
+                </a>
+
+                <a class="ppm-item" href="assets.html" data-key="assets">
+                    <span class="ppm-icon">
+                        <!-- Cube -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4a2 2 0 001-1.73z" />
+                            <path d="M3.27 6.96L12 12l8.73-5.04" />
+                            <path d="M12 22V12" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Total Assets</span>
+                </a>
+
+                <a class="ppm-item" href="sheet.html" data-key="sheet">
+                    <span class="ppm-icon">
+                        <!-- File Text -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                            <path d="M14 2v6h6" />
+                            <path d="M16 13H8" />
+                            <path d="M16 17H8" />
+                            <path d="M10 9H8" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Sheet 5B7S</span>
+                </a>
+
+                <a class="ppm-item" href="radio.html" data-key="radio">
+                    <span class="ppm-icon">
+                        <!-- Radio -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="2" />
+                            <path d="M4.93 4.93a10 10 0 0114.14 0" />
+                            <path d="M1.42 1.42a16 16 0 0122.63 0" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">PPM Radio</span>
+                </a>
+
+                <a class="ppm-item active" href="bot-list.html" data-key="bots">
+                    <span class="ppm-icon">
+                        <!-- Bot -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <rect x="3" y="11" width="18" height="10" rx="2" />
+                            <circle cx="7" cy="16" r="1" />
+                            <circle cx="17" cy="16" r="1" />
+                            <path d="M12 2v4" />
+                            <path d="M8 2h8" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Bot's List</span>
+                </a>
+
+                <!-- divider -->
+                <div class="ppm-divider" role="separator"></div>
+
+                <a class="ppm-item" href="settings.html" data-key="settings">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83l-.04.04a2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2h-.1a2 2 0 0 1-2-2v-.09a1.65 1.65 极速 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 极速 0 0 1-2.83 0l-.04-.04a2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 极速 0-1.51-1H3a2 2 0 0 1-2-2v-.1a2 2 0 0 1 2-2h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82L4.2 6.3a2 2 0 0 1 0-2.83L4.24 3.43a2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2h.1a2 2 0 0 1 2 2v.09c.12.6.6 1.08 1.2 1.2h.01a1.65 1.65 0 0 0 1.51 1z" />
+                        </svg>
+                    </span>
+                    <span class="ppm极速-label">Settings</span>
+                </a>
+
+                <button id="ppmLogout" class="ppm-item ppm-button" type="button" data-key="logout">
+                    <span class="ppm-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M16 17l5-5-5-5" />
+                            <path d="M21 12H9" />
+                            <path d="M9 19H5a2 2 0 0 1-2-2极速V7a2 2 极速0 0 1 2-2h4" />
+                        </svg>
+                    </span>
+                    <span class="ppm-label">Logout</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main">
+            <div class="container">
+                <div class="header">
+                    <div class="header-title">
+                        <i class="icon" data-lucide="bot" style="color: var(--primary); width: 28px; height: 28px;"></i>
+                        <h1>Bot Configuration List</h1>
+                    </div>
+                    <button class="btn btn-outline" id="add-bot-btn">
+                        <i class="icon mr-2" data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
+                        Add New Bot Config
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Manage Your Bot Configurations</div>
+                        <div class="card-description">Overview of all configured bots, their version, status, and installation details. Click headers to sort.</div>
+                    </div>
+                    <div class="card-content">
+                        <table class="table">
+                            <thead class="table-header">
+                                <tr>
+                                    <th onclick="requestSort('enabled')" class="cursor-pointer" style="width: 80px;">
+                                        <div class="flex items-center">Enabled <i class="icon ml-1 opacity-40" data-lucide="arrow-up-down" style="width: 12px; height: 12px;"></i></div>
+                                    </th>
+                                    <th onclick="requestSort('room')" class="cursor-pointer">
+                                        <div class="flex items-center">Room <i class="icon ml-1 opacity-40" data-lucide="arrow-up-down" style="width: 12px; height: 12px;"></i></div>
+                                    </th>
+                                    <th onclick="requestSort('version')" class="cursor-pointer">
+                                        <div class="flex items-center">Version <i class="icon ml-1 opacity-40极速" data-lucide="arrow-up-down" style="width: 12px; height: 12px;"></i></div>
+                                    </th>
+                                    <th onclick="requestSort('status')" class="cursor-pointer">
+                                        <div class="flex items-center">Status <i class="icon ml-1 opacity-40" data-lucide="arrow-up-down" style="width: 12px; height: 12px;"></i></div>
+                                    </th>
+                                    <th onclick="requestSort('installationDate')" class="cursor-pointer">
+                                        <div class="flex items-center">Installed <i class="icon ml-1 opacity-40" data-lucide="arrow-up-down" style="width: 12px; height: 12px;"></i></div>
+                                    </th>
+                                    <th onclick="requestSort('lastUpdatedAt')" class="cursor-pointer md-table-cell">
+                                        <div class="flex items-center">Last Updated <i class="icon ml-1 opacity-40" data-lucide="arrow-up-down" style="width: 12px; height: 12px;"></i></div>
+                                    </th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bots-table-body">
+                                <!-- Bot rows will be inserted here -->
+                            </tbody>
+                        </table>
+                        <div id="empty-state" class="py-10 text-center text-muted hidden">
+                            <i class="icon mx-auto mb-3" data-lucide="bot" style="width: 48px; height: 48px;"></i>
+                            <p>No bot configurations found. Add one to get started!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add/Edit Bot Dialog -->
+            <div id="form-dialog" class="dialog-overlay hidden">
+                <div class="dialog-content">
+                    <div class极速="dialog-header">
+                        <div class="dialog-title" id="form-dialog-title">Add New Bot Configuration</div>
+                        <div class="dialog-description" id="form-dialog-description">Enter the details for the new bot configuration.</div>
+                    </div>
+                    <form id="bot-form">
+                        <div class="scroll-area">
+                            <div class="dialog-body">
+                                <div class="form-grid">
+                                    <label for="formRoom" class="form-label">Room</label>
+                                    <input type="text" id="formRoom" class="form-input" placeholder="e.g., Server Room A" required>
+                                </div>
+                                <div class="form-grid mt-4">
+                                    <label for="formVersion" class="form-label">Version</label>
+                                    <div class="form-input p-0">
+                                        <select id="formVersion" class="select-trigger">
+                                            <option value="V1.9.1">V1.9.1</option>
+                                            <option value="V2.0">V2.0</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-grid mt-4">
+                                    <label for="formStatus" class="form-label">Status</label>
+                                    <div class="form-input p-0">
+                                        <select id="formStatus" class="select-trigger">
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                            <option value="error">Error</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-grid mt-4">
+                                    <label for="formInstallationDate" class="form-label">Installation Date</label>
+                                    <div class="form-input p-0">
+                                        <button type="button" id="date-trigger" class="select-trigger justify-start">
+                                            <i class="icon mr-2" data-lucide="calendar" style="width: 16px; height: 16px;"></i>
+                                            <span id="date-display">Pick a date</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-grid mt-4">
+                                    <label for="formEnabled" class="form-label">Enabled</label>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="formEnabled" class="checkbox" checked>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dialog-footer">
+                            <button type="button" id="cancel-btn" class="btn btn-outline">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Bot Config</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Dialog -->
+            <div id="delete-dialog" class="dialog-overlay hidden">
+                <div class="alert-dialog-content">
+                    <div class="dialog-header">
+                        <div class="dialog-title">Are you sure?</div>
+                        <div class="dialog-description">This action cannot be undone. This will permanently delete the bot configuration for room: <span id="delete-room-name"></span>.</div>
+                    </div>
+                    <div class="dialog-footer">
+                        <button type="button" id="cancel-delete-btn" class="btn btn-outline">Cancel</button>
+                        <button type="button" id="confirm-delete-btn" class="btn btn-destructive">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Picker Popover -->
+            <div id="date-picker" class="card hidden" style="position: absolute; z-index: 50; width: auto;">
+                <div class="calendar">
+                    <input type="date" id="date-input" class="form-input">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase App -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+     <script>
+        // Initialize Firebase
+           // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDesT-ZOX0b3Vlaj8Ts7SYPotHV-6Yh1Lg",
+            authDomain: "ppm-server-23bae.firebaseapp.com",
+            projectId: "ppm-server-23bae",
+            storageBucket: "ppm-server-23bae.appspot.com",
+            messagingSenderId: "499971564114",
+            appId: "1:499971564114:web:817c1ab6075531c26ff58b",
+            measurementId: "G-492288554"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // State management
+        let bots = [];
+        let isLoading = true;
+        let isFormDialogOpen = false;
+        let editingBot = null;
+        let botToDelete = null;
+        let sortConfig = { key: 'lastUpdatedAt', direction: 'descending' };
+        
+        // Form state
+        let formRoom = "";
+        let formVersion = "V1.9.1";
+        let formStatus = "active";
+        let formInstallationDate = new Date();
+        let formEnabled = true;
+
+        // DOM Elements
+        const botsTableBody = document.getElementById('bots-table-body');
+        const emptyState = document.getElementById('empty-state');
+        const formDialog = document.getElementById('form-dialog');
+        const formDialogTitle = document.getElementById('form-dialog-title');
+        const formDialogDescription = document.getElementById('form-dialog-description');
+        const botForm = document.getElementById('bot-form');
+        const deleteDialog = document.getElementById('delete-dialog');
+        const deleteRoomName = document.getElementById('delete-room-name');
+        const datePicker = document.getElementById('date-picker');
+        const dateInput = document.getElementById('date-input');
+        const dateDisplay = document.getElementById('date-display');
+        
+        // Sidebar elements
+        const sidebar = document.getElementById('appSidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up authentication state observer
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // User is signed in, load bots
+                    loadBots();
+                } else {
+                    // No user is signed in, show message
+                    botsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <p>Please sign in to view bot configurations</p>
+                                <button class="btn btn-primary mt-2" onclick="location.href='login.html'">Sign In</button>
+                            </td>
+                        </tr>
+                    `;
+                    emptyState.classList.add('hidden');
+                    isLoading = false;
+                }
+            });
+            
+            // Set up event listeners
+            document.getElementById('add-bot-btn').addEventListener('click', () => handleOpenFormDialog());
+            document.getElementById('cancel-btn').addEventListener('click', () => closeFormDialog());
+            document.getElementById('cancel-delete-btn').addEventListener('click', () => closeDeleteDialog());
+            document.getElementById('confirm-delete-btn').addEventListener('click', () => handleDeleteBot());
+            
+            botForm.addEventListener('submit', (e) => handleSaveBot(e));
+            
+            // Date picker
+            document.getElementById('date-trigger').addEventListener('click', (e) => {
+                const rect = e.target.getBoundingClientRect();
+                datePicker.style.top = `${rect.bottom + window.scrollY}px`;
+                datePicker.style.left = `${rect.left + window.scrollX}px`;
+                datePicker.classList.toggle('hidden');
+            });
+            
+            dateInput.addEventListener('change', (e) => {
+                formInstallationDate = new Date(e.target.value);
+                dateDisplay.textContent = formatDate(formInstallationDate);
+                datePicker.classList.add('hidden');
+            });
+            
+            // Close date picker when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#date-trigger') && !e.target.closest('#date-picker')) {
+                    datePicker.classList.add('hidden');
+                }
+            });
+            
+            // Initialize with current date
+            dateDisplay.textContent = formatDate(formInstallationDate);
+            dateInput.valueAsDate = formInstallationDate;
+            
+            // Initialize sidebar functionality
+            initSidebar();
+        });
+
+        // Initialize sidebar functionality
+        function initSidebar() {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                sidebarBackdrop.classList.toggle('active');
+                sidebarToggle.setAttribute('aria-expanded', sidebar.classList.contains('active'));
+            });
+            
+            sidebarBackdrop.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                sidebarBackdrop.classList.remove('active');
+                sidebarToggle.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        // Safe date conversion function
+        function safeConvertToDate(timestamp) {
+            if (!timestamp) return new Date();
+            
+            // If it's already a Date object
+            if (timestamp instanceof Date) return timestamp;
+            
+            // If it's a Firestore Timestamp
+            if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+                return timestamp.toDate();
+            }
+            
+            // If it's a string or number
+            return new Date(timestamp);
+        }
+
+        // Format date for display
+        function formatDate(date) {
+            const validDate = safeConvertToDate(date);
+            return validDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        // Format relative time
+        function formatDistanceToNow(date) {
+            const validDate = safeConvertToDate(date);
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - validDate) / 1000);
+            
+            if (diffInSeconds < 60) {
+                return `${diffInSeconds} seconds ago`;
+            }
+            
+            const diffInMinutes = Math.floor(diffInSeconds / 60);
+            if (diffInMinutes < 60) {
+                return `${diffInMinutes} minutes ago`;
+            }
+            
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            if (diffInHours < 24) {
+                return `${diffInHours} hours ago`;
+            }
+            
+            const diffInDays = Math.floor(diffInHours / 24);
+            if (diffInDays < 30) {
+                return `${diffInDays} days ago`;
+            }
+            
+            const diffInMonths = Math.floor(diffInDays / 30);
+            if (diffInMonths < 12) {
+                return `${diffInMonths} months ago`;
+            }
+            
+            const diffInYears = Math.floor(diffInMonths / 12);
+            return `${diffInYears} years ago`;
+        }
+
+        // Load bots from Firestore
+        function loadBots() {
+            isLoading = true;
+            botsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="flex justify-center items-center">
+                            <i class="icon spinner mr-2" data-lucide="loader-2" style="width: 32px; height: 32px; color: var(--primary);"></i>
+                            <p>Loading bot configurations...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            
+            db.collection("botConfigurations")
+                .orderBy("lastUpdatedAt", "desc")
+                .onSnapshot((snapshot) => {
+                    bots = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        bots.push({
+                            id: doc.id,
+                            ...data
+                        });
+                    });
+                    
+                    isLoading = false;
+                    renderBots();
+                }, (error) => {
+                    console.error("Error fetching bot configurations: ", error);
+                    showToast("Error", "Could not fetch bot configurations.", "destructive");
+                    isLoading = false;
+                    renderBots();
+                });
+        }
+
+        // Get status badge class
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'active': return 'badge-active';
+                case 'inactive': return 'badge-inactive';
+                case 'error': return 'badge-error';
+                default: return 'badge-inactive';
+            }
+        }
+
+        // Sort bots based on current sort configuration
+        function sortBots() {
+            return [...bots].sort((a, b) => {
+                let aValue = a[sortConfig.key];
+                let bValue = b[sortConfig.key];
+                
+                // Handle dates
+                if (sortConfig.key.includes('Date') || sortConfig.key.includes('At')) {
+                    aValue = safeConvertToDate(aValue).getTime();
+                    bValue = safeConvertToDate(bValue).getTime();
+                }
+                
+                // Handle strings
+                if (typeof aValue === 'string') {
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
+                
+                // Compare values
+                if (aValue < bValue) {
+                    return sortConfig.direction === 'ascending' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortConfig.direction === 'ascending' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+
+        // Request sort by column
+        function requestSort(key) {
+            if (sortConfig.key === key) {
+                sortConfig.direction = sortConfig.direction === 'ascending' ? 'descending' : 'ascending';
+            } else {
+                sortConfig.key = key;
+                sortConfig.direction = 'ascending';
+            }
+            
+            renderBots();
+        }
+
+        // Render bots to the table
+        function renderBots() {
+            if (isLoading) {
+                return;
+            }
+            
+            if (bots.length === 0) {
+                botsTableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            // Sort bots
+            const sortedBots = sortBots();
+            
+            // Generate table rows
+            let html = '';
+            sortedBots.forEach(bot => {
+                html += `
+                    <tr class="table-row">
+                        <td>
+                            <div class="checkbox-container">
+                                <input type="checkbox" class="checkbox" ${bot.enabled ? 'checked' : ''} 
+                                    onchange="toggleBotEnabled('${bot.id}', ${bot.enabled})" 
+                                    id="bot-enabled-${bot.id}"
+                                    aria-label="Enable ${bot.room}">
+                            </div>
+                        </td>
+                        <td class="font-medium">${bot.room || 'N/A'}</td>
+                        <td>${bot.version || 'N/A'}</td>
+                        <td>
+                            <span class="badge ${getStatusBadgeClass(bot.status)}">
+                                ${bot.status ? bot.status.charAt(0).toUpperCase() + bot.status.slice(1) : 'Unknown'}
+                            </span>
+                        </td>
+                        <td>${formatDate(bot.installationDate)}</td>
+                        <td class="md-table-cell text-xs">
+                            ${formatDistanceToNow(bot.lastUpdatedAt)} by ${bot.addedByUserName || "N/A"}
+                        </td>
+                        <td class="text-right">
+                            <button class="btn btn-ghost btn-icon" title="Edit Bot Config" onclick="handleOpenFormDialog('${bot.id}')">
+                                <i class="icon" data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn btn-ghost btn-icon" title="Delete Bot Config" onclick="confirmDeleteBot('${bot.id}')">
+                                <i class="icon" data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            botsTableBody.innerHTML = html;
+            
+            // Initialize Lucide icons for the new elements
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        // Open form dialog for adding/editing bots
+        function handleOpenFormDialog(botId = null) {
+            if (botId) {
+                editingBot = bots.find(bot => bot.id === botId);
+                if (editingBot) {
+                    formRoom = editingBot.room || '';
+                    formVersion = editingBot.version || 'V1.9.1';
+                    formStatus = editingBot.status || 'active';
+                    formInstallationDate = safeConvertToDate(editingBot.installationDate);
+                    formEnabled = editingBot.enabled !== undefined ? editingBot.enabled : true;
+                    
+                    formDialogTitle.textContent = "Edit Bot Configuration";
+                    formDialogDescription.textContent = "Update the details for this bot configuration.";
+                }
+            } else {
+                editingBot = null;
+                formRoom = "";
+                formVersion = "V1.9.1";
+                formStatus = "active";
+                formInstallationDate = new Date();
+                formEnabled = true;
+                
+                formDialogTitle.textContent = "Add New Bot Configuration";
+                formDialogDescription.textContent = "Enter the details for the new bot configuration.";
+            }
+            
+            // Update form values
+            document.getElementById('formRoom').value = formRoom;
+            document.getElementById('formVersion').value = formVersion;
+            document.getElementById('formStatus').value = formStatus;
+            document.getElementById('formEnabled').checked = formEnabled;
+            dateDisplay.textContent = formatDate(formInstallationDate);
+            dateInput.valueAsDate = formInstallationDate;
+            
+            // Update submit button text
+            const submitButton = botForm.querySelector('button[type="submit"]');
+            submitButton.textContent = editingBot ? "Update Bot Config" : "Add Bot Config";
+            
+            // Show dialog
+            formDialog.classList.remove('hidden');
+            isFormDialogOpen = true;
+        }
+
+        // Close form dialog
+        function closeFormDialog() {
+            formDialog.classList.add('hidden');
+            isFormDialogOpen = false;
+            editingBot = null;
+        }
+
+        // Save bot
+        function handleSaveBot(e) {
+            e.preventDefault();
+            
+            formRoom = document.getElementById('formRoom').value;
+            formVersion = document.getElementById('formVersion').value;
+            formStatus = document.getElementById('formStatus').value;
+            formEnabled = document.getElementById('formEnabled').checked;
+            
+            if (!formRoom || !formInstallationDate) {
+                showToast("Missing Information", "Please fill Room and Installation Date fields.", "destructive");
+                return;
+            }
+            
+            const user = auth.currentUser;
+            if (!user) {
+                showToast("Authentication Error", "You must be logged in.", "destructive");
+                return;
+            }
+            
+            const now = firebase.firestore.Timestamp.now();
+            const installationDate = new Date(formInstallationDate);
+            installationDate.setHours(0, 0, 0, 0);
+            
+            const botData = {
+                room: formRoom,
+                version: formVersion,
+                status: formStatus,
+                installationDate: firebase.firestore.Timestamp.fromDate(installationDate),
+                enabled: formEnabled,
+                lastUpdatedAt: now,
+                addedByUserId: user.uid,
+                addedByUserName: user.displayName || "Unknown User",
+            };
+            
+            if (editingBot) {
+                // Update existing bot
+                db.collection("botConfigurations").doc(editingBot.id).update(botData)
+                    .then(() => {
+                        showToast("Bot Configuration Updated", `"${formRoom}" has been updated.`);
+                        closeFormDialog();
+                    })
+                    .catch((error) => {
+                        console.error("Error updating bot configuration: ", error);
+                        showToast("Save Error", "Could not update the bot configuration.", "destructive");
+                    });
+            } else {
+                // Add new bot
+                botData.createdAt = now;
+                db.collection("botConfigurations").add(botData)
+                    .then(() => {
+                        showToast("Bot Configuration Added", `"${formRoom}" has been added.`);
+                        closeFormDialog();
+                    })
+                    .catch((error) => {
+                        console.error("Error adding bot configuration: ", error);
+                        showToast("Save Error", "Could not add the bot configuration.", "destructive");
+                    });
+            }
+        }
+
+        // Confirm delete bot
+        function confirmDeleteBot(botId) {
+            botToDelete = bots.find(bot => bot.id === botId);
+            if (botToDelete) {
+                deleteRoomName.textContent = botToDelete.room;
+                deleteDialog.classList.remove('hidden');
+            }
+        }
+
+        // Close delete dialog
+        function closeDeleteDialog() {
+            deleteDialog.classList.add('hidden');
+            botToDelete = null;
+        }
+
+        // Handle delete bot
+        function handleDeleteBot() {
+            if (!botToDelete) return;
+            
+            db.collection("botConfigurations").doc(botToDelete.id).delete()
+                .then(() => {
+                    showToast("Bot Configuration Deleted", `"${botToDelete.room}" has been deleted.`);
+                    closeDeleteDialog();
+                })
+                .catch((error) => {
+                    console.error("Error deleting bot configuration: ", error);
+                    showToast("Deletion Error", "Could not delete the bot configuration.", "destructive");
+                    closeDeleteDialog();
+                });
+        }
+
+        // Toggle bot enabled status
+        function toggleBotEnabled(botId, currentEnabled) {
+            const user = auth.currentUser;
+            if (!user) {
+                showToast("Authentication Error", "You must be logged in.", "destructive");
+                return;
+            }
+            
+            db.collection("botConfigurations").doc(botId).update({
+                enabled: !currentEnabled,
+                lastUpdatedAt: firebase.firestore.Timestamp.now(),
+                addedByUserId: user.uid,
+                addedByUserName: user.displayName || "Unknown User",
+            })
+            .then(() => {
+                showToast("Status Updated", `Bot enabled status changed.`);
+            })
+            .catch((error) => {
+                console.error("Error updating bot enabled status:", error);
+                showToast("Update Error", "Could not update bot enabled status.", "destructive");
+            });
+        }
+
+        // Show toast notification
+        function showToast(title, description, variant = "default") {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `card ${variant === 'destructive' ? 'border-destructive' : ''}`;
+            toast.style.position = 'fixed';
+            toast.style.bottom = '1rem';
+            toast.style.right = '1rem';
+            toast.style.padding = '1rem';
+            toast.style.minWidth = '300px';
+            toast.style.zIndex = '100';
+            
+            toast.innerHTML = `
+                <div class="font-semibold">${title}</div>
+                <div class="text-sm mt-1">${description}</div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
